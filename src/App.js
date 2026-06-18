@@ -192,7 +192,29 @@ function MechanicForm() {
 
         <select required name="insurance" value={form.insurance} onChange={handle} style={{ ...styles.input, color: form.insurance ? "#F1F5F9" : "#64748B" }}>
           <option value="" disabled style={{ color:"#0F172A" }}>Auto liability insurance?</option>
-          <option value="yes" styl
+          <option value="yes" style={{ color:"#0F172A" }}>Yes</option>
+          <option value="no" style={{ color:"#0F172A" }}>No</option>
+        </select>
+      </div>
+
+      <div style={styles.formRow}>
+        <select required name="fulltime" value={form.fulltime} onChange={handle} style={{ ...styles.input, color: form.fulltime ? "#F1F5F9" : "#64748B" }}>
+          <option value="" disabled style={{ color:"#0F172A" }}>Full time or part time?</option>
+          <option value="full" style={{ color:"#0F172A" }}>Full time</option>
+          <option value="part" style={{ color:"#0F172A" }}>Part time / side work</option>
+        </select>
+        <div style={{ flex: 1 }} />
+      </div>
+
+      <button type="submit" style={styles.btnWhite} disabled={loading}>
+        {loading ? "Submitting..." : "Apply to Join →"}
+      </button>
+
+      {error && <p style={styles.errorText}>Something didn't go through — mind trying once more?</p>}
+      <p style={styles.finePrint}>All applicants go through a background check and platform interview. We'll be in touch within 48 hours.</p>
+    </form>
+  );
+}
 
 
 
