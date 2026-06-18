@@ -1,10 +1,8 @@
 import { useState } from "react";
 
-
 const SERVICES = ["Oil Change","Battery Replacement","Brake Pads","Diagnostic Scan","Air Filter Replacement","Other"];
 const MECHANIC_SERVICES = ["Oil Changes","Battery Replacement","Brake Pads","Diagnostic Scans","Air Filters","Tire Rotation","Spark Plugs","Other"];
 
-// SVG automotive icons — subtle, line-weight consistent
 const Icon = ({ name, size = 22, color = "#F97316" }) => {
   const icons = {
     wrench: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
@@ -17,7 +15,6 @@ const Icon = ({ name, size = 22, color = "#F97316" }) => {
   return icons[name] || null;
 };
 
-// Tire tread SVG pattern for hero bg
 const TireTreadBg = () => (
   <svg style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", opacity:0.045, pointerEvents:"none" }} xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -33,7 +30,6 @@ const TireTreadBg = () => (
   </svg>
 );
 
-// Speed lines for mechanic banner
 const SpeedLines = () => (
   <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0.12, pointerEvents:"none" }} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
     {[0,1,2,3,4,5,6,7,8].map(i => (
@@ -42,7 +38,6 @@ const SpeedLines = () => (
   </svg>
 );
 
-// Subtle hex bolt watermark for section dividers
 const BoltDivider = () => (
   <div style={{ display:"flex", alignItems:"center", gap:12, margin:"0 0 48px" }}>
     <div style={{ flex:1, height:1, background:"linear-gradient(90deg, transparent, #1E293B)" }}/>
@@ -56,19 +51,31 @@ function CustomerForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const submit = (e) => {
+
+  const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(false);
-    fetch("https://formspree.io/f/xaqzzzyz", {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: new FormData(e.target),
-    })
-      .then((res) => { if (res.ok) setSubmitted(true); else setError(true); })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+
+    try {
+      const res = await fetch("https://formspree.io/f/xaqzzzyz", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(e.target),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) return (
@@ -102,12 +109,15 @@ function CustomerForm() {
         <input required name="make" placeholder="Make" value={form.make} onChange={handle} style={styles.input}/>
         <input required name="model" placeholder="Model" value={form.model} onChange={handle} style={styles.input}/>
       </div>
-      <button type="submit" style={styles.btnOrange} disabled={loading}>{loading ? "Submitting..." : "Claim My $20 Off →"}</button>
+      <button type="submit" style={styles.btnOrange} disabled={loading}>
+        {loading ? "Submitting..." : "Claim My $20 Off →"}
+      </button>
       {error && <p style={styles.errorText}>Something didn't go through — mind trying once more?</p>}
       <p style={styles.finePrint}>No payment required. We'll contact you when a mechanic is available in your area.</p>
     </form>
   );
 }
+
 
 function MechanicForm() {
   const [form, setForm] = useState({ name:"", email:"", phone:"", city:"", experience:"", insurance:"", fulltime:"" });
@@ -115,22 +125,35 @@ function MechanicForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const toggleService = (s) => setSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  const submit = (e) => {
+
+  const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(false);
-    const data = new FormData(e.target);
-    data.append("services_offered", selected.join(", "));
-    fetch("https://formspree.io/f/mlgkkkeq", {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: data,
-    })
-      .then((res) => { if (res.ok) setSubmitted(true); else setError(true); })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+
+    try {
+      const data = new FormData(e.target);
+      data.append("services_offered", selected.join(", "));
+
+      const res = await fetch("https://formspree.io/f/mlgkkkeq", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: data,
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) return (
@@ -173,10 +196,14 @@ function MechanicForm() {
       <p style={styles.formSubhead}>Services you offer</p>
       <div style={styles.chipGrid}>
         {MECHANIC_SERVICES.map(s => (
-          <button type="button" key={s} onClick={() => toggleService(s)} style={{ ...styles.chip, ...(selected.includes(s) ? styles.chipActive : {}) }}>{s}</button>
+          <button type="button" key={s} onClick={() => toggleService(s)} style={{ ...styles.chip, ...(selected.includes(s) ? styles.chipActive : {}) }}>
+            {s}
+          </button>
         ))}
       </div>
-      <button type="submit" style={styles.btnWhite} disabled={loading}>{loading ? "Submitting..." : "Apply to Join →"}</button>
+      <button type="submit" style={styles.btnWhite} disabled={loading}>
+        {loading ? "Submitting..." : "Apply to Join →"}
+      </button>
       {error && <p style={styles.errorText}>Something didn't go through — mind trying once more?</p>}
       <p style={styles.finePrint}>All applicants go through a background check and platform interview. We'll be in touch within 48 hours.</p>
     </form>
@@ -188,8 +215,6 @@ export default function MechConnect() {
 
   return (
     <div style={styles.page}>
-
-      {/* NAV */}
       <nav style={styles.nav}>
         <span style={styles.logo}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight:8, verticalAlign:"middle", marginBottom:2 }}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -202,7 +227,6 @@ export default function MechConnect() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section style={styles.hero}>
         <TireTreadBg/>
         <div style={styles.heroInner}>
@@ -241,17 +265,16 @@ export default function MechConnect() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
       <section id="how" style={styles.section}>
         <p style={styles.sectionEyebrow}>How it works</p>
         <h2 style={styles.sectionTitle}>Four steps. Zero shops.</h2>
         <BoltDivider/>
         <div style={styles.stepsGrid}>
           {[
-            { n:"01", icon:"mappin",     title:"Tell us what you need",        body:"Enter your location, car details, and the service you need. Takes 60 seconds." },
-            { n:"02", icon:"wrench",     title:"We match your mechanic",       body:"A vetted MechConnect mechanic in your area confirms and shows up at your chosen time." },
-            { n:"03", icon:"checkcircle",title:"Approve before anything is bought", body:"If parts are needed, your mechanic shows you the cost first. You say yes. Then and only then does anything get purchased." },
-            { n:"04", icon:"shield",     title:"Pay flat labor. Nothing more.", body:"Labor fee paid upfront. Parts paid directly to your mechanic at the job. No surcharges. No shop markups." },
+            { n:"01", icon:"mappin", title:"Tell us what you need", body:"Enter your location, car details, and the service you need. Takes 60 seconds." },
+            { n:"02", icon:"wrench", title:"We match your mechanic", body:"A vetted MechConnect mechanic in your area confirms and shows up at your chosen time." },
+            { n:"03", icon:"checkcircle", title:"Approve before anything is bought", body:"If parts are needed, your mechanic shows you the cost first. You say yes. Then and only then does anything get purchased." },
+            { n:"04", icon:"shield", title:"Pay flat labor. Nothing more.", body:"Labor fee paid upfront. Parts paid directly to your mechanic at the job. No surcharges. No shop markups." },
           ].map(s => (
             <div key={s.n} style={styles.stepCard}>
               <div style={styles.stepHeader}>
@@ -265,18 +288,17 @@ export default function MechConnect() {
         </div>
       </section>
 
-      {/* SERVICES */}
       <section id="services" style={styles.sectionDark}>
         <div style={{ maxWidth:640, margin:"0 auto" }}>
           <p style={styles.sectionEyebrow}>What we fix</p>
           <h2 style={styles.sectionTitle}>Common services. Flat rates.</h2>
           <div style={styles.priceGrid}>
             {[
-              { service:"Oil Change",          price:"$50",  note:"+ parts", icon:"rotatecw" },
-              { service:"Battery Replacement", price:"$50",  note:"+ parts", icon:"checkcircle" },
-              { service:"Brake Pads",          price:"$100", note:"per axle + parts", icon:"shield" },
-              { service:"Diagnostic Scan",     price:"$75",  note:"labor only", icon:"wrench" },
-              { service:"Air Filter",          price:"$30",  note:"+ parts", icon:"star" },
+              { service:"Oil Change", price:"$50", note:"+ parts", icon:"rotatecw" },
+              { service:"Battery Replacement", price:"$50", note:"+ parts", icon:"checkcircle" },
+              { service:"Brake Pads", price:"$100", note:"per axle + parts", icon:"shield" },
+              { service:"Diagnostic Scan", price:"$75", note:"labor only", icon:"wrench" },
+              { service:"Air Filter", price:"$30", note:"+ parts", icon:"star" },
             ].map(r => (
               <div key={r.service} style={styles.priceCard}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -294,19 +316,18 @@ export default function MechConnect() {
         </div>
       </section>
 
-      {/* WHY */}
       <section style={styles.section}>
         <p style={styles.sectionEyebrow}>Why MechConnect</p>
         <h2 style={styles.sectionTitle}>Built different.</h2>
         <BoltDivider/>
         <div style={styles.whyGrid}>
           {[
-            { icon:"wrench",      title:"Vetted mechanics only",   body:"Every mechanic passes a background check, experience review, and platform interview before their first job." },
-            { icon:"checkcircle", title:"No surprise costs",       body:"Your mechanic quotes every part before buying it. You approve. Full stop." },
-            { icon:"star",        title:"Real ratings",            body:"Every job gets rated. Mechanics below 4.0 stars get reviewed. Below 3.5 get removed." },
-            { icon:"mappin",      title:"We come to you",          body:"Your driveway, office lot, or anywhere your car sits. You don't lose a day in a waiting room." },
-            { icon:"shield",      title:"OE-quality parts",        body:"We require OE-equivalent parts or better on every job. Brands like Bosch, Brembo, Denso. No cheap knockoffs." },
-            { icon:"rotatecw",    title:"30-day guarantee",        body:"If the repair fails due to mechanic error within 30 days, your mechanic comes back and fixes it free." },
+            { icon:"wrench", title:"Vetted mechanics only", body:"Every mechanic passes a background check, experience review, and platform interview before their first job." },
+            { icon:"checkcircle", title:"No surprise costs", body:"Your mechanic quotes every part before buying it. You approve. Full stop." },
+            { icon:"star", title:"Real ratings", body:"Every job gets rated. Mechanics below 4.0 stars get reviewed. Below 3.5 get removed." },
+            { icon:"mappin", title:"We come to you", body:"Your driveway, office lot, or anywhere your car sits. You don't lose a day in a waiting room." },
+            { icon:"shield", title:"OE-quality parts", body:"We require OE-equivalent parts or better on every job. Brands like Bosch, Brembo, Denso. No cheap knockoffs." },
+            { icon:"rotatecw", title:"30-day guarantee", body:"If the repair fails due to mechanic error within 30 days, your mechanic comes back and fixes it free." },
           ].map(w => (
             <div key={w.title} style={styles.whyCard}>
               <div style={styles.whyIconWrap}><Icon name={w.icon} size={18} color="#F97316"/></div>
@@ -317,7 +338,6 @@ export default function MechConnect() {
         </div>
       </section>
 
-      {/* MECHANIC BANNER */}
       <section style={styles.mechanicBanner}>
         <SpeedLines/>
         <div style={styles.mechanicBannerInner}>
@@ -333,7 +353,6 @@ export default function MechConnect() {
         </div>
       </section>
 
-      {/* DUAL FORM */}
       <section id="get-started" style={styles.formSection}>
         <div style={styles.formSectionInner}>
           <div style={styles.tabRow}>
@@ -344,23 +363,23 @@ export default function MechConnect() {
               I am a mechanic
             </button>
           </div>
+
           {activeTab === "customer" ? (
             <div>
               <h2 style={styles.formTitle}>Get $20 off your first service</h2>
               <p style={styles.formDesc}>Join the waitlist. We'll confirm availability in your area and reach out within 24 hours.</p>
-              <CustomerForm/>
+              <CustomerForm />
             </div>
           ) : (
             <div>
               <h2 style={styles.formTitle}>Apply to join MechConnect</h2>
               <p style={styles.formDesc}>Founding mechanics get priority jobs, zero platform fees during launch, and 80% of every labor booking.</p>
-              <MechanicForm/>
+              <MechanicForm />
             </div>
           )}
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer style={styles.footer}>
         <span style={styles.logo}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight:6, verticalAlign:"middle", marginBottom:2 }}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -376,38 +395,33 @@ export default function MechConnect() {
 
 const styles = {
   page: { fontFamily:"'Inter', system-ui, sans-serif", background:"#0F172A", color:"#F1F5F9", minHeight:"100vh" },
-
   nav: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 32px", borderBottom:"1px solid #1E293B", position:"sticky", top:0, background:"#0F172A", zIndex:100, minHeight:64, boxSizing:"border-box" },
   logo: { fontSize:20, fontWeight:800, letterSpacing:"-0.3px", color:"#F1F5F9", whiteSpace:"nowrap", flexShrink:0, display:"flex", alignItems:"center" },
   navLinks: { display:"flex", gap:24, flexShrink:1, overflow:"hidden" },
   navLink: { color:"#94A3B8", textDecoration:"none", fontSize:13, fontWeight:500, whiteSpace:"nowrap" },
-
   hero: { padding:"60px 32px 52px", borderBottom:"1px solid #1E293B", position:"relative", overflow:"hidden" },
   heroInner: { maxWidth:720, margin:"0 auto", position:"relative", zIndex:1 },
   eyebrow: { display:"inline-flex", alignItems:"center", background:"#1E293B", color:"#F97316", fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", padding:"6px 12px", borderRadius:4, marginBottom:24, border:"1px solid #2D3F55" },
   heroTitle: { fontSize:"clamp(32px, 5vw, 64px)", fontWeight:900, lineHeight:1.08, letterSpacing:"-1px", margin:"0 0 20px" },
   heroSub: { fontSize:17, color:"#94A3B8", lineHeight:1.7, maxWidth:540, margin:"0 0 36px" },
   heroCtas: { display:"flex", gap:14, flexWrap:"wrap", marginBottom:52 },
-  btnOrangeHero: { background:"#F97316", color:"#fff", padding:"13px 26px", borderRadius:6, fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-block", cursor:"pointer", border:"none", boxShadow:"0 0 0 0 #F9731640", transition:"box-shadow 0.2s" },
+  btnOrangeHero: { background:"#F97316", color:"#fff", padding:"13px 26px", borderRadius:6, fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-block", cursor:"pointer", border:"none" },
   btnGhostHero: { background:"transparent", color:"#F1F5F9", padding:"13px 26px", borderRadius:6, fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-block", border:"1px solid #334155", cursor:"pointer" },
   heroStats: { display:"flex", gap:0, borderTop:"1px solid #1E293B", paddingTop:28 },
   stat: { display:"flex", flexDirection:"column", flex:1, paddingRight:28 },
   statNum: { fontSize:30, fontWeight:900, color:"#F97316", letterSpacing:"-1px" },
   statLabel: { fontSize:12, color:"#64748B", marginTop:2 },
   statDivider: { width:1, background:"#1E293B", margin:"0 28px 0 0" },
-
   section: { padding:"72px 32px", maxWidth:1100, margin:"0 auto" },
   sectionDark: { padding:"72px 32px", background:"#080F1A", borderTop:"1px solid #1E293B", borderBottom:"1px solid #1E293B" },
   sectionEyebrow: { color:"#F97316", fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10, display:"flex", alignItems:"center", gap:8 },
   sectionTitle: { fontSize:"clamp(26px, 4vw, 40px)", fontWeight:900, letterSpacing:"-0.8px", margin:"0 0 20px" },
-
   stepsGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(210px, 1fr))", gap:16 },
   stepCard: { background:"#1E293B", borderRadius:10, padding:24, borderLeft:"3px solid #F97316", borderTop:"1px solid #2D3F55" },
   stepHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 },
   stepNum: { fontSize:12, fontWeight:800, color:"#F97316", letterSpacing:"0.06em" },
   stepTitle: { fontSize:16, fontWeight:700, margin:"0 0 10px", lineHeight:1.3 },
   stepBody: { fontSize:13, color:"#94A3B8", lineHeight:1.65, margin:0 },
-
   priceGrid: { display:"flex", flexDirection:"column", gap:3, marginBottom:20 },
   priceCard: { display:"flex", justifyContent:"space-between", alignItems:"center", background:"#1E293B", padding:"16px 20px", borderRadius:8, border:"1px solid #2D3F55" },
   priceIconWrap: { width:30, height:30, background:"#0F172A", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
@@ -416,20 +430,17 @@ const styles = {
   priceAmount: { fontSize:20, fontWeight:900, color:"#F97316" },
   priceNote: { fontSize:11, color:"#64748B" },
   priceDisclaimer: { textAlign:"center", color:"#64748B", fontSize:12, maxWidth:480, margin:"0 auto" },
-
   whyGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(270px, 1fr))", gap:16 },
   whyCard: { background:"#1E293B", borderRadius:10, padding:24, border:"1px solid #2D3F55" },
   whyIconWrap: { width:36, height:36, background:"#0F172A", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14, border:"1px solid #334155" },
   whyTitle: { fontSize:15, fontWeight:700, margin:"0 0 8px" },
   whyBody: { fontSize:13, color:"#94A3B8", lineHeight:1.65, margin:0 },
-
   mechanicBanner: { background:"#EA6A0A", padding:"56px 32px", position:"relative", overflow:"hidden" },
   mechanicBannerInner: { maxWidth:1000, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", gap:32, flexWrap:"wrap", position:"relative", zIndex:1 },
   bannerEyebrow: { fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#7C2D12", marginBottom:10, display:"flex", alignItems:"center" },
   bannerTitle: { fontSize:"clamp(22px, 3vw, 34px)", fontWeight:900, color:"#fff", letterSpacing:"-0.5px", margin:"0 0 10px" },
   bannerSub: { fontSize:15, color:"#FED7AA", maxWidth:480, lineHeight:1.65, margin:0 },
   btnBannerCta: { background:"#0F172A", color:"#fff", padding:"14px 28px", borderRadius:6, fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-block", cursor:"pointer", border:"none", whiteSpace:"nowrap", flexShrink:0 },
-
   formSection: { padding:"72px 32px", background:"#080F1A", borderTop:"1px solid #1E293B" },
   formSectionInner: { maxWidth:660, margin:"0 auto" },
   tabRow: { display:"flex", background:"#1E293B", borderRadius:8, padding:4, marginBottom:36, border:"1px solid #2D3F55" },
@@ -447,12 +458,10 @@ const styles = {
   btnOrange: { background:"#F97316", color:"#fff", border:"none", borderRadius:6, padding:"14px 20px", fontWeight:700, fontSize:15, cursor:"pointer", marginTop:6, fontFamily:"inherit" },
   btnWhite: { background:"#F1F5F9", color:"#0F172A", border:"none", borderRadius:6, padding:"14px 20px", fontWeight:700, fontSize:15, cursor:"pointer", marginTop:6, fontFamily:"inherit" },
   finePrint: { fontSize:11, color:"#475569", textAlign:"center", margin:"4px 0 0" },
-  errorText: { fontSize:12, color:"#F87171", textAlign:"center", margin:"4px 0 0", fontWeight:600 },
   successBox: { background:"#1E293B", borderRadius:10, padding:36, textAlign:"center", border:"1px solid #334155" },
   successIcon: { width:52, height:52, background:"#F97316", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px" },
   successTitle: { fontSize:22, fontWeight:900, margin:"0 0 10px" },
   successText: { color:"#94A3B8", fontSize:15, lineHeight:1.6, margin:0 },
-
   footer: { padding:"44px 32px", borderTop:"1px solid #1E293B", textAlign:"center" },
   footerRule: { width:40, height:2, background:"#F97316", margin:"16px auto" },
   footerSub: { color:"#64748B", fontSize:13, margin:"8px 0 0" },
