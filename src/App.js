@@ -1,10 +1,5 @@
 import { useState } from "react";
-import { initForm } from '@formspree/ajax';
 
-initForm({
-  formElement: '#contact-form',
-  formId: 'YOUR_FORM_ID',
-});
 
 const SERVICES = ["Oil Change","Battery Replacement","Brake Pads","Diagnostic Scan","Air Filter Replacement","Other"];
 const MECHANIC_SERVICES = ["Oil Changes","Battery Replacement","Brake Pads","Diagnostic Scans","Air Filters","Tire Rotation","Spark Plugs","Other"];
