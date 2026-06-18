@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 const SERVICES = ["Oil Change","Battery Replacement","Brake Pads","Diagnostic Scan","Air Filter Replacement","Other"];
-const MECHANIC_SERVICES = ["Oil Changes","Battery Replacement","Brake Pads","Diagnostic Scans","Air Filters","Tire Rotation","Spark Plugs","Other"];
 
 const Icon = ({ name, size = 22, color = "#F97316" }) => {
   const icons = {
@@ -66,11 +65,8 @@ function CustomerForm() {
         body: new FormData(e.target),
       });
 
-      if (res.ok) {
-        setSubmitted(true);
-      } else {
-        setError(true);
-      }
+      if (res.ok) setSubmitted(true);
+      else setError(true);
     } catch {
       setError(true);
     } finally {
@@ -118,16 +114,13 @@ function CustomerForm() {
   );
 }
 
-
 function MechanicForm() {
   const [form, setForm] = useState({ name:"", email:"", phone:"", city:"", experience:"", insurance:"", fulltime:"" });
-  const [selected, setSelected] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const toggleService = (s) => setSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -136,11 +129,10 @@ function MechanicForm() {
 
     try {
       const res = await fetch("https://formspree.io/f/mlgkkkeq", {
-  method: "POST",
-  headers: { Accept: "application/json" },
-  body: new FormData(e.target),
-});
-
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(e.target),
+      });
 
       if (res.ok) setSubmitted(true);
       else setError(true);
@@ -188,14 +180,6 @@ function MechanicForm() {
         </select>
         <div style={{ flex:1 }}/>
       </div>
-      <p style={styles.formSubhead}>Services you offer</p>
-      <div style={styles.chipGrid}>
-        {MECHANIC_SERVICES.map(s => (
-          <button type="button" key={s} onClick={() => toggleService(s)} style={{ ...styles.chip, ...(selected.includes(s) ? styles.chipActive : {}) }}>
-            {s}
-          </button>
-        ))}
-      </div>
       <button type="submit" style={styles.btnWhite} disabled={loading}>
         {loading ? "Submitting..." : "Apply to Join →"}
       </button>
@@ -204,7 +188,6 @@ function MechanicForm() {
     </form>
   );
 }
-
 
 export default function MechConnect() {
   const [activeTab, setActiveTab] = useState("customer");
@@ -352,12 +335,8 @@ export default function MechConnect() {
       <section id="get-started" style={styles.formSection}>
         <div style={styles.formSectionInner}>
           <div style={styles.tabRow}>
-            <button style={{ ...styles.tab, ...(activeTab === "customer" ? styles.tabActive : {}) }} onClick={() => setActiveTab("customer")}>
-              I need a mechanic
-            </button>
-            <button style={{ ...styles.tab, ...(activeTab === "mechanic" ? styles.tabActive : {}) }} onClick={() => setActiveTab("mechanic")}>
-              I am a mechanic
-            </button>
+            <button type="button" style={{ ...styles.tab, ...(activeTab === "customer" ? styles.tabActive : {}) }} onClick={() => setActiveTab("customer")}>I need a mechanic</button>
+            <button type="button" style={{ ...styles.tab, ...(activeTab === "mechanic" ? styles.tabActive : {}) }} onClick={() => setActiveTab("mechanic")}>I am a mechanic</button>
           </div>
 
           {activeTab === "customer" ? (
@@ -448,12 +427,10 @@ const styles = {
   formRow: { display:"flex", gap:10 },
   formSubhead: { fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#F97316", margin:"6px 0 0" },
   input: { flex:1, background:"#1E293B", border:"1px solid #334155", borderRadius:6, padding:"12px 14px", color:"#F1F5F9", fontSize:14, outline:"none", fontFamily:"inherit", minWidth:0 },
-  chipGrid: { display:"flex", flexWrap:"wrap", gap:8, marginBottom:4 },
-  chip: { background:"#1E293B", border:"1px solid #334155", color:"#94A3B8", padding:"7px 13px", borderRadius:20, fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"inherit" },
-  chipActive: { background:"#F97316", border:"1px solid #F97316", color:"#fff" },
   btnOrange: { background:"#F97316", color:"#fff", border:"none", borderRadius:6, padding:"14px 20px", fontWeight:700, fontSize:15, cursor:"pointer", marginTop:6, fontFamily:"inherit" },
   btnWhite: { background:"#F1F5F9", color:"#0F172A", border:"none", borderRadius:6, padding:"14px 20px", fontWeight:700, fontSize:15, cursor:"pointer", marginTop:6, fontFamily:"inherit" },
   finePrint: { fontSize:11, color:"#475569", textAlign:"center", margin:"4px 0 0" },
+  errorText: { color:"#FCA5A5", fontSize:13, margin:"6px 0 0" },
   successBox: { background:"#1E293B", borderRadius:10, padding:36, textAlign:"center", border:"1px solid #334155" },
   successIcon: { width:52, height:52, background:"#F97316", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px" },
   successTitle: { fontSize:22, fontWeight:900, margin:"0 0 10px" },
