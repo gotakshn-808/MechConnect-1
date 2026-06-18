@@ -198,9 +198,9 @@ export default function MechConnect() {
             <span style={{ marginRight: 6, opacity: 0.7 }}>📍</span>Now serving Overland Park &amp; Kansas City
           </div>
           <h1 style={styles.heroTitle}>
-            Your mechanic.<br />
-            <span style={{ color: "#F97316" }}>Your driveway.</span><br />
-            Your price.
+            Honest Mechanic.<br />
+            <span style={{ color: "#F97316" }}>Your Driveway.</span><br />
+            Clear Price.
           </h1>
           <p style={styles.heroSub}>
             MechConnect sends vetted mobile mechanics to you — at home, at work, wherever your car is parked.
