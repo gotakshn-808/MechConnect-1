@@ -135,14 +135,12 @@ function MechanicForm() {
     setError(false);
 
     try {
-      const data = new FormData(e.target);
-      data.append("services_offered", selected.join(", "));
-
       const res = await fetch("https://formspree.io/f/mlgkkkeq", {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: data,
-      });
+  method: "POST",
+  headers: { Accept: "application/json" },
+  body: new FormData(e.target),
+});
+
 
       if (res.ok) setSubmitted(true);
       else setError(true);
