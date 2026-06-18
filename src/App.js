@@ -136,7 +136,7 @@ function MechanicForm() {
 
     try {
       const data = new FormData(e.target);
-      data.append("services_offered", selected.join(", "));
+      data.set("services_offered", selected.join(", "));
 
       const res = await fetch("https://formspree.io/f/mlgkkkeq", {
         method: "POST",
@@ -144,11 +144,8 @@ function MechanicForm() {
         body: data,
       });
 
-      if (res.ok) {
-        setSubmitted(true);
-      } else {
-        setError(true);
-      }
+      if (res.ok) setSubmitted(true);
+      else setError(true);
     } catch {
       setError(true);
     } finally {
@@ -166,46 +163,8 @@ function MechanicForm() {
 
   return (
     <form onSubmit={submit} style={styles.form}>
-      <div style={styles.formRow}>
-        <input required name="name" placeholder="Full name" value={form.name} onChange={handle} style={styles.input}/>
-        <input required name="email" type="email" placeholder="Email address" value={form.email} onChange={handle} style={styles.input}/>
-      </div>
-      <div style={styles.formRow}>
-        <input required name="phone" type="tel" placeholder="Phone number" value={form.phone} onChange={handle} style={styles.input}/>
-        <input required name="city" placeholder="City you operate in" value={form.city} onChange={handle} style={styles.input}/>
-      </div>
-      <div style={styles.formRow}>
-        <select required name="experience" value={form.experience} onChange={handle} style={{ ...styles.input, color: form.experience ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Years of experience</option>
-          {["Less than 1 year","1–2 years","3–5 years","6–10 years","10+ years"].map(y => <option key={y} value={y} style={{ color:"#0F172A" }}>{y}</option>)}
-        </select>
-        <select required name="insurance" value={form.insurance} onChange={handle} style={{ ...styles.input, color: form.insurance ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Auto liability insurance?</option>
-          <option value="yes" style={{ color:"#0F172A" }}>Yes</option>
-          <option value="no" style={{ color:"#0F172A" }}>No</option>
-        </select>
-      </div>
-      <div style={styles.formRow}>
-        <select required name="fulltime" value={form.fulltime} onChange={handle} style={{ ...styles.input, color: form.fulltime ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Full time or part time?</option>
-          <option value="full" style={{ color:"#0F172A" }}>Full time</option>
-          <option value="part" style={{ color:"#0F172A" }}>Part time / side work</option>
-        </select>
-        <div style={{ flex:1 }}/>
-      </div>
-      <p style={styles.formSubhead}>Services you offer</p>
-      <div style={styles.chipGrid}>
-        {MECHANIC_SERVICES.map(s => (
-          <button type="button" key={s} onClick={() => toggleService(s)} style={{ ...styles.chip, ...(selected.includes(s) ? styles.chipActive : {}) }}>
-            {s}
-          </button>
-        ))}
-      </div>
-      <button type="submit" style={styles.btnWhite} disabled={loading}>
-        {loading ? "Submitting..." : "Apply to Join →"}
-      </button>
-      {error && <p style={styles.errorText}>Something didn't go through — mind trying once more?</p>}
-      <p style={styles.finePrint}>All applicants go through a background check and platform interview. We'll be in touch within 48 hours.</p>
+      <input type="hidden" name="services_offered" value={selected.join(", ")} />
+      ...
     </form>
   );
 }
