@@ -385,7 +385,7 @@ export default function MechConnect() {
         </span>
         <p style={styles.footerSub}>Real mechanics. Real prices. Right where you are.</p>
         <div style={styles.footerRule}/>
-        <p style={styles.footerMeta}>© 2026 MechConnect · Overland Park, KS · hello@mechconnect.com</p>
+        <p style={styles.footerMeta}>© 2026 MechConnect · Overland Park, KS · contactmechconnect@gmail.com</p>
       </footer>
     </div>
   );
