@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useForm, ValidationError } from "@formspree/react";
 
 const SERVICES = ["Oil Change","Battery Replacement","Brake Pads","Diagnostic Scan","Air Filter Replacement","Other"];
 
@@ -115,75 +116,65 @@ function CustomerForm() {
 }
 
 function MechanicForm() {
-  const [form, setForm] = useState({ name:"", email:"", phone:"", city:"", experience:"", insurance:"", fulltime:"" });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [state, handleSubmit] = useForm("mlgkkkeq");
 
-  const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(false);
-
-    try {
-      const res = await fetch("https://formspree.io/f/mlgkkkeq", {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: new FormData(e.target),
-      });
-
-      if (res.ok) setSubmitted(true);
-      else setError(true);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (submitted) return (
-    <div style={styles.successBox}>
-      <div style={styles.successIcon}><Icon name="checkcircle" size={28} color="#fff"/></div>
-      <h3 style={styles.successTitle}>Application received.</h3>
-      <p style={styles.successText}>We'll review your info and reach out within <span style={{ color:"#F97316", fontWeight:700 }}>48 hours</span> to schedule your vetting call. Welcome to MechConnect.</p>
-    </div>
-  );
+  if (state.succeeded) {
+    return (
+      <div style={styles.successBox}>
+        <div style={styles.successIcon}><Icon name="checkcircle" size={28} color="#fff"/></div>
+        <h3 style={styles.successTitle}>Application received.</h3>
+        <p style={styles.successText}>We'll review your info and reach out within <span style={{ color:"#F97316", fontWeight:700 }}>48 hours</span> to schedule your vetting call. Welcome to MechConnect.</p>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={submit} style={styles.form}>
+    <form onSubmit={handleSubmit} style={styles.form}>
       <div style={styles.formRow}>
-        <input required name="name" placeholder="Full name" value={form.name} onChange={handle} style={styles.input}/>
-        <input required name="email" type="email" placeholder="Email address" value={form.email} onChange={handle} style={styles.input}/>
+        <input required name="name" placeholder="Full name" style={styles.input} />
+        <input required name="email" type="email" placeholder="Email address" style={styles.input} />
       </div>
+      <ValidationError field="name" prefix="Name" errors={state.errors} />
+      <ValidationError field="email" prefix="Email" errors={state.errors} />
+
       <div style={styles.formRow}>
-        <input required name="phone" type="tel" placeholder="Phone number" value={form.phone} onChange={handle} style={styles.input}/>
-        <input required name="city" placeholder="City you operate in" value={form.city} onChange={handle} style={styles.input}/>
+        <input required name="phone" type="tel" placeholder="Phone number" style={styles.input} />
+        <input required name="city" placeholder="City you operate in" style={styles.input} />
       </div>
+      <ValidationError field="phone" prefix="Phone" errors={state.errors} />
+      <ValidationError field="city" prefix="City" errors={state.errors} />
+
       <div style={styles.formRow}>
-        <select required name="experience" value={form.experience} onChange={handle} style={{ ...styles.input, color: form.experience ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Years of experience</option>
-          {["Less than 1 year","1–2 years","3–5 years","6–10 years","10+ years"].map(y => <option key={y} value={y} style={{ color:"#0F172A" }}>{y}</option>)}
+        <select required name="experience" defaultValue="" style={styles.input}>
+          <option value="" disabled>Years of experience</option>
+          <option value="Less than 1 year">Less than 1 year</option>
+          <option value="1–2 years">1–2 years</option>
+          <option value="3–5 years">3–5 years</option>
+          <option value="6–10 years">6–10 years</option>
+          <option value="10+ years">10+ years</option>
         </select>
-        <select required name="insurance" value={form.insurance} onChange={handle} style={{ ...styles.input, color: form.insurance ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Auto liability insurance?</option>
-          <option value="yes" style={{ color:"#0F172A" }}>Yes</option>
-          <option value="no" style={{ color:"#0F172A" }}>No</option>
+        <select required name="insurance" defaultValue="" style={styles.input}>
+          <option value="" disabled>Auto liability insurance?</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
         </select>
       </div>
+      <ValidationError field="experience" prefix="Experience" errors={state.errors} />
+      <ValidationError field="insurance" prefix="Insurance" errors={state.errors} />
+
       <div style={styles.formRow}>
-        <select required name="fulltime" value={form.fulltime} onChange={handle} style={{ ...styles.input, color: form.fulltime ? "#F1F5F9" : "#64748B" }}>
-          <option value="" disabled style={{ color:"#0F172A" }}>Full time or part time?</option>
-          <option value="full" style={{ color:"#0F172A" }}>Full time</option>
-          <option value="part" style={{ color:"#0F172A" }}>Part time / side work</option>
+        <select required name="fulltime" defaultValue="" style={styles.input}>
+          <option value="" disabled>Full time or part time?</option>
+          <option value="full">Full time</option>
+          <option value="part">Part time / side work</option>
         </select>
         <div style={{ flex:1 }}/>
       </div>
-      <button type="submit" style={styles.btnWhite} disabled={loading}>
-        {loading ? "Submitting..." : "Apply to Join →"}
+      <ValidationError field="fulltime" prefix="Work status" errors={state.errors} />
+
+      <button type="submit" style={styles.btnWhite} disabled={state.submitting}>
+        {state.submitting ? "Submitting..." : "Apply to Join →"}
       </button>
-      {error && <p style={styles.errorText}>Something didn't go through — mind trying once more?</p>}
       <p style={styles.finePrint}>All applicants go through a background check and platform interview. We'll be in touch within 48 hours.</p>
     </form>
   );
@@ -224,22 +215,6 @@ export default function MechConnect() {
           <div style={styles.heroCtas}>
             <a href="#get-started" style={styles.btnOrangeHero} onClick={() => setActiveTab("customer")}>Book a Mechanic</a>
             <a href="#get-started" style={styles.btnGhostHero} onClick={() => setActiveTab("mechanic")}>I'm a Mechanic →</a>
-          </div>
-          <div style={styles.heroStats}>
-            <div style={styles.stat}>
-              <span style={styles.statNum}>$50</span>
-              <span style={styles.statLabel}>Oil change labor</span>
-            </div>
-            <div style={styles.statDivider}/>
-            <div style={styles.stat}>
-              <span style={styles.statNum}>80%</span>
-              <span style={styles.statLabel}>Mechanic payout</span>
-            </div>
-            <div style={styles.statDivider}/>
-            <div style={styles.stat}>
-              <span style={styles.statNum}>$20</span>
-              <span style={styles.statLabel}>Off first service</span>
-            </div>
           </div>
         </div>
       </section>
