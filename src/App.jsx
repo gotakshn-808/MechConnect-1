@@ -110,9 +110,9 @@ function CustomerForm() {
         <input required name="model" placeholder="Model" value={form.model} onChange={handle} style={styles.input}/>
       </div>
       <button type="submit" style={styles.btnOrange} disabled={loading}>
-        {loading ? "Submitting..." : "Claim My $20 Off â"}
+        {loading ? "Submitting..." : "Book My Service"}
       </button>
-      {error && <p style={styles.errorText}>Something didn't go through â mind trying once more?</p>}
+      {error && <p style={styles.errorText}>Something didn't go through - mind trying once more?</p>}
       <p style={styles.finePrint}>No payment required. We'll contact you when a mechanic is available in your area.</p>
     </form>
   );
@@ -172,7 +172,7 @@ function MechanicForm() {
       <div style={styles.formRow}>
         <select required name="experience" value={form.experience} onChange={handle} style={{ ...styles.input, color: form.experience ? "#F1F5F9" : "#64748B" }}>
           <option value="" disabled style={{ color:"#0F172A" }}>Years of experience</option>
-          {["Less than 1 year","1â2 years","3â5 years","6â10 years","10+ years"].map(y => <option key={y} value={y} style={{ color:"#0F172A" }}>{y}</option>)}
+          {["Less than 1 year","1-2 years","3-5 years","6-10 years","10+ years"].map(y => <option key={y} value={y} style={{ color:"#0F172A" }}>{y}</option>)}
         </select>
         <select required name="insurance" value={form.insurance} onChange={handle} style={{ ...styles.input, color: form.insurance ? "#F1F5F9" : "#64748B" }}>
           <option value="" disabled style={{ color:"#0F172A" }}>Auto liability insurance?</option>
@@ -197,9 +197,9 @@ function MechanicForm() {
         ))}
       </div>
       <button type="submit" style={styles.btnWhite} disabled={loading}>
-        {loading ? "Submitting..." : "Apply to Join â"}
+        {loading ? "Submitting..." : "Apply to Join"}
       </button>
-      {error && <p style={styles.errorText}>Something didn't go through â mind trying once more?</p>}
+      {error && <p style={styles.errorText}>Something didn't go through - mind trying once more?</p>}
       <p style={styles.finePrint}>All applicants go through a background check and platform interview. We'll be in touch within 48 hours.</p>
     </form>
   );
@@ -227,20 +227,20 @@ export default function MechConnect() {
         <TireTreadBg/>
         <div style={styles.heroInner}>
           <div style={styles.eyebrow}>
-            <span style={{ marginRight:6, opacity:0.7 }}>ð</span>Now serving Overland Park &amp; Kansas City
+            <span style={{ marginRight:6, opacity:0.7 }}></span>Now serving Overland Park &amp; Kansas City
           </div>
           <h1 style={styles.heroTitle}>
-            Your mechanic.<br/>
-            <span style={{ color:"#F97316" }}>Your driveway.</span><br/>
-            Your price.
+            Trusted Mechanics.<br/>
+            <span style={{ color:"#F97316" }}>Your Driveway.</span><br/>
+            Clear Price.
           </h1>
           <p style={styles.heroSub}>
-            MechConnect sends vetted mobile mechanics to you â at home, at work, wherever your car is parked.
+            MechConnect sends vetted mobile mechanics to you - at home, at work, wherever your car is parked.
             Flat labor rates. Parts always approved before purchase. No waiting rooms.
           </p>
           <div style={styles.heroCtas}>
             <a href="#get-started" style={styles.btnOrangeHero} onClick={() => setActiveTab("customer")}>Book a Mechanic</a>
-            <a href="#get-started" style={styles.btnGhostHero} onClick={() => setActiveTab("mechanic")}>I'm a Mechanic â</a>
+            <a href="#get-started" style={styles.btnGhostHero} onClick={() => setActiveTab("mechanic")}>I'm a Mechanic </a>
           </div>
           <div style={styles.heroStats}>
             <div style={styles.stat}>
@@ -343,9 +343,9 @@ export default function MechConnect() {
               <span style={{ marginLeft:6 }}>Are you a mobile mechanic?</span>
             </div>
             <h2 style={styles.bannerTitle}>Get paid customers sent to you.</h2>
-            <p style={styles.bannerSub}>Keep 80% of every labor job. Zero subscription fees during launch. You do the work â we handle the rest.</p>
+            <p style={styles.bannerSub}>Keep 80% of every labor job. Zero subscription fees during launch. You do the work and we handle the rest.</p>
           </div>
-          <a href="#get-started" style={styles.btnBannerCta} onClick={() => setActiveTab("mechanic")}>Apply to Join â</a>
+          <a href="#get-started" style={styles.btnBannerCta} onClick={() => setActiveTab("mechanic")}>Apply to Join</a>
         </div>
       </section>
 
@@ -383,7 +383,7 @@ export default function MechConnect() {
         </span>
         <p style={styles.footerSub}>Real mechanics. Real prices. Right where you are.</p>
         <div style={styles.footerRule}/>
-        <p style={styles.footerMeta}>Â© 2026 MechConnect Â· Overland Park, KS Â· contactmechconnect@gmail.com</p>
+        <p style={styles.footerMeta}>© 2026 MechConnect · Overland Park, KS · contactmechconnect@gmail.com</p>
       </footer>
     </div>
   );
